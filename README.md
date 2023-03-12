@@ -11,4 +11,4 @@
 </p>
 
 
-##### use deep learning for image segmantation to make this task 
+##### use deep learning for this task 
