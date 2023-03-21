@@ -136,11 +136,13 @@ def main():
             result = remove_background(newimg)
             l_image.image(result, width=400)
             st.success('Done !', icon="✅")
-            st.sidebar.download_button(
+            download_btn = st.sidebar.download_button(
                     label='Download 💾',
                     data=prepare_image_to_download(result), 
                     file_name='SelfieBackgroundRemover_image.png',
                     mime=f'image/png')
+            if download_btn:
+                 st.sidebar.success('Image downloaded', icon="✅")
         except:
             st.warning('Image is invalid', icon="⚠️")
     elif done_btn_cropped:
@@ -148,12 +150,13 @@ def main():
             result = remove_background(cropped_image)
             l_image.image(result, width=400)
             st.success('Done !', icon="✅")
-            st.sidebar.download_button(
+            download_btn = st.sidebar.download_button(
                         label='Download 💾',
                         data=prepare_image_to_download(result), 
                         file_name='SelfieBackgroundRemover_image.png',
                         mime=f'image/png')
-            st.sidebar.success('Image downloaded', icon="✅")
+            if download_btn:
+                st.sidebar.success('Image downloaded', icon="✅")
 
         except:
             st.warning('Image is invalid', icon="⚠️")
