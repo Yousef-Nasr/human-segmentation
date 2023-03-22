@@ -61,35 +61,37 @@ def image_process_for_model(path):
     return img
 
 def prepare_image_to_download(path):
-    '''prepare image to download by make range(0, 255) '''
-    path = (path * 255).astype(np.uint8)
-    path = Image.fromarray(path)
+    '''prepare image to download '''
     buffered = BytesIO()
     path.save(buffered, format="JPEG")
     return buffered.getvalue()
 
-def remove_background(path, model=model):
-    '''For make model prediction and return the result image'''
+def remove_background(path, size_img ,model=model):
+    '''For make model prediction and upsample image to original size then return the result image'''
     predicted_mask = model.predict(image_process_for_model(path))[0]
     result = predicted_mask * load_original_image(path)
+    #for upsampling image to original size
+    result = (result * 255).astype(np.uint8)
+    result = Image.fromarray(result.astype(np.uint8))
+    result = result.resize(size_img, resample=Image.Resampling.LANCZOS) 
     return result
 
 
 def main():
     '''main function for Streamlit app'''
-    html_temp="""
+    header_temp="""
                 <div style="background: linear-gradient(to right, #ff5f6d, #ffc371); margin-bottom:20px;">
                 <h2 style="color:white;text-align:center; font-family:unset;">Selfie Background Remover </h2>
                 </div>
               """
-    html_temp1="""
-                <div style="background: linear-gradient(to left, #ff5f6d, #ffc371); margin-top:100%;" >
+    repo_temp="""
+                <div style="background: linear-gradient(to left, #ff5f6d, #ffc371); margin-top:50px" >
                 <h4 style="color:white;text-align:center; font-family:unset;">
                 <a style="color:black; text-decoration:none; font-size:30px" href="https://github.com/Yousef-Nasr/human-segmentation">🚀 Git repository</a>
                 </h4>
                 </div>
               """
-    st.markdown(html_temp,unsafe_allow_html=True)
+    st.markdown(header_temp,unsafe_allow_html=True)
     r_image, l_image = st.columns(2)
     option = st.sidebar.radio('Select input type:', ('Upload', 'URL'))
     if option == 'Upload':
@@ -97,8 +99,9 @@ def main():
         if uploaded_file:
             # display uploaded image
             r_image.image(uploaded_file, caption="original image", width=500)
-            pil_img = Image.open(uploaded_file)
-            newimg = pil_img.copy()
+            img = Image.open(uploaded_file)
+            newimg = img.copy()
+            real_size = img.copy()
             if newimg.size > (500, 500):
                 newimg = newimg.resize((500, 500))
             #cropping box
@@ -117,6 +120,7 @@ def main():
                 img = Image.open(BytesIO(response.content))
                 r_image.image(img, caption="original image", width=500)
                 newimg = img.copy()
+                real_size = img.copy()
                 if newimg.size > (500, 500):
                     newimg = newimg.resize((500, 500))
                 with st.expander('Crop'):
@@ -125,7 +129,8 @@ def main():
                         cropped_image = st_cropper(newimg, realtime_update=True, box_color="red", should_resize_image=False)
                     with l_crop:
                         if cropped_image is not None:
-                            st.image(cropped_image.resize((256,256)), caption="Cropped Image", width=400)
+                            st.image(cropped_image, caption="Cropped Image", width=400)
+                            real_size_crop = cropped_image.size
             except:
                 st.warning('URL is invalid', icon="🚨")
     done_btn_original = st.button('Remove Background from original image 🧙‍♂️', use_container_width=True)
@@ -133,21 +138,21 @@ def main():
 
     if done_btn_original:
         try:
-            result = remove_background(newimg)
-            l_image.image(result, width=400)
+            result = remove_background(newimg, size_img=real_size.size)
+            l_image.image(result)
             st.success('Done !', icon="✅")
             download_btn = st.sidebar.download_button(
-                    label='Download 💾',
-                    data=prepare_image_to_download(result), 
-                    file_name='SelfieBackgroundRemover_image.png',
-                    mime=f'image/png')
+                        label='Download 💾',
+                        data=prepare_image_to_download(result), 
+                        file_name='SelfieBackgroundRemover_image.png',
+                        mime=f'image/png')
             if download_btn:
-                 st.sidebar.success('Image downloaded', icon="✅")
+                st.sidebar.success('Image downloaded', icon="✅")
         except:
             st.warning('Image is invalid', icon="⚠️")
     elif done_btn_cropped:
         try:
-            result = remove_background(cropped_image)
+            result = remove_background(cropped_image.resize((256,256)), size_img=real_size_crop)
             l_image.image(result, width=400)
             st.success('Done !', icon="✅")
             download_btn = st.sidebar.download_button(
@@ -161,9 +166,8 @@ def main():
         except:
             st.warning('Image is invalid', icon="⚠️")
     
-    st.sidebar.markdown(html_temp1,unsafe_allow_html=True)
+    st.sidebar.markdown(repo_temp,unsafe_allow_html=True)
 
     
 if __name__ == '__main__':
     main()
-
