@@ -12,7 +12,7 @@ from streamlit_cropper import st_cropper
 
 
 # metric to evaluate the model
-def dice_coeff(y_true: tf.Tensor, y_pred: tf.Tensor, smooth: float=1.0) -> tf.Tensor:
+def dice_coeff(y_true, y_pred, smooth=1.0):
     y_true = tf.cast(y_true, tf.float32)
     y_pred = tf.cast(y_pred, tf.float32)
     intersection = tf.reduce_sum(y_true * y_pred, axis=[1, 2, 3])
