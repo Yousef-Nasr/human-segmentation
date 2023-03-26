@@ -109,6 +109,7 @@ def main():
                 r_crop, l_crop = st.columns(2, gap='large')
                 with r_crop:
                     cropped_image = st_cropper(newimg, realtime_update=True, box_color="red", should_resize_image=False)
+                    original_size_crop = cropped_image.size
                 with l_crop:
                     if cropped_image is not None:
                         st.image(cropped_image.resize((256,256)), caption="Cropped Image", width=400)
@@ -127,10 +128,10 @@ def main():
                     r_crop, l_crop = st.columns(2, gap='large')
                     with r_crop:
                         cropped_image = st_cropper(newimg, realtime_update=True, box_color="red", should_resize_image=False)
+                        original_size_crop = cropped_image.size
                     with l_crop:
                         if cropped_image is not None:
                             st.image(cropped_image, caption="Cropped Image", width=400)
-                            real_size_crop = cropped_image.size
             except:
                 st.warning('URL is invalid', icon="🚨")
     done_btn_original = st.button('Remove Background from original image 🧙‍♂️', use_container_width=True)
@@ -152,7 +153,7 @@ def main():
             st.warning('Image is invalid', icon="⚠️")
     elif done_btn_cropped:
         try:
-            result = remove_background(cropped_image.resize((256,256)), size_img=real_size_crop)
+            result = remove_background(cropped_image.resize((256,256)), size_img=original_size_crop)
             l_image.image(result, width=400)
             st.success('Done !', icon="✅")
             download_btn = st.sidebar.download_button(
