@@ -37,7 +37,7 @@ def load_cached_model(model_url):
     # download the model file from Google Drive
     url = 'https://drive.google.com/uc?id=' + model_url.split('/')[-2]
     model_filename, headers = urllib.request.urlretrieve(url)
-
+    
     # load the model from the downloaded file
     loaded_model = keras.models.load_model(model_filename)
 
