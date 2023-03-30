@@ -61,4 +61,6 @@ In conclusion, this project demonstrates an effective approach to selfie image s
 
 **[Colab Notebook](https://colab.research.google.com/drive/1_ScnyyP6axYOLAQHmbW4egAAVN-Dt7Vr?usp=sharing)**
 
+**[Presentation](https://docs.google.com/presentation/d/1CmlmSTYpDhpsL18fi-KEGMf4H9hM1QNKRfft2Mna-cw/edit?usp=sharing)**
+
 **[Live demo](https://yousef-nasr-selfie-background-remover.streamlit.app/)**
